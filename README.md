@@ -115,15 +115,15 @@ Use `#pragma mark -` to categorize methods in functional groupings and protocol/
 
 ## Spacing
 
-* Indent using 2 spaces (this conserves space in print and makes line wrapping less likely). Never indent with tabs. Be sure to set this preference in Xcode.
+* Indent using 4 spaces (this conserves space in print and makes line wrapping less likely). Never indent with tabs. Be sure to set this preference in Xcode.
 * Method braces and other braces (`if`/`else`/`switch`/`while` etc.) always open on the same line as the statement but close on a new line.
 
 **Preferred:**
 ```objc
 if (user.isHappy) {
-  //Do something
+    //Do something
 } else {
-  //Do something else
+    //Do something else
 }
 ```
 
@@ -147,9 +147,9 @@ else {
 ```objc
 // blocks are easily readable
 [UIView animateWithDuration:1.0 animations:^{
-  // something
+    // something
 } completion:^(BOOL finished) {
-  // something
+    // something
 }];
 ```
 
@@ -211,13 +211,18 @@ Properties should be camel-case with the leading word being lowercase. Use auto-
 **Preferred:**
 
 ```objc
-@property (strong, nonatomic) NSString *descriptiveVariableName;
+@property (nonatomic, strong) NSString *descriptiveVariableName;
+@property (weak, nonatomic) IBOutlet UIView *view;
 ```
 
 **Not Preferred:**
 
 ```objc
 id varnm;
+or
+@property (strong, nonatomic) NSString *descriptiveVariableName;
+or
+@property (nonatomic, weak) IBOutlet UIView *view;
 ```
 
 ### Underscores
@@ -289,7 +294,7 @@ Property attributes should be explicitly listed, and will help new programmers w
 
 ```objc
 @property (weak, nonatomic) IBOutlet UIView *containerView;
-@property (strong, nonatomic) NSString *tutorialName;
+@property (nonatomic, strong) NSString *tutorialName;
 ```
 
 **Not Preferred:**
@@ -305,7 +310,7 @@ Why? Even if you declared a property as `NSString` somebody might pass in an ins
 **Preferred:**
 
 ```objc
-@property (copy, nonatomic) NSString *tutorialName;
+@property (nonatomic, copy) NSString *tutorialName;
 ```
 
 **Not Preferred:**
@@ -343,8 +348,8 @@ UIApplication.sharedApplication.delegate;
 ```objc
 NSArray *names = @[@"Brian", @"Matt", @"Chris", @"Alex", @"Steve", @"Paul"];
 NSDictionary *productManagers = @{@"iPhone": @"Kate", @"iPad": @"Kamal", @"Mobile Web": @"Bill"};
-NSNumber *shouldUseLiterals = @YES;
-NSNumber *buildingStreetNumber = @10018;
+NSNumber *shouldUseLiterals = @(YES);
+NSNumber *buildingStreetNumber = @(10018);
 ```
 
 **Not Preferred:**
@@ -482,9 +487,9 @@ Private properties should be declared in class extensions (anonymous categories)
 ```objc
 @interface RWTDetailViewController ()
 
-@property (strong, nonatomic) GADBannerView *googleAdView;
-@property (strong, nonatomic) ADBannerView *iAdView;
-@property (strong, nonatomic) UIWebView *adXWebView;
+@property (nonatomic, strong) GADBannerView *googleAdView;
+@property (nonatomic, strong) ADBannerView  *iAdView;
+@property (nonatomic, strong) UIWebView     *adXWebView;
 
 @end
 ```
@@ -498,8 +503,12 @@ This allows for more consistency across files and greater visual clarity.
 **Preferred:**
 
 ```objc
-if (someObject) {}
-if (![anotherObject boolValue]) {}
+if (someObject) {
+    //
+}
+if (![anotherObject boolValue]) {
+    //
+}
 ```
 
 **Not Preferred:**
@@ -525,14 +534,14 @@ Conditional bodies should always use braces even when a conditional body could b
 **Preferred:**
 ```objc
 if (!error) {
-  return success;
+    return success;
 }
 ```
 
 **Not Preferred:**
 ```objc
 if (!error)
-  return success;
+    return success;
 ```
 
 or
@@ -567,11 +576,14 @@ Init methods should follow the convention provided by Apple's generated code tem
 
 ```objc
 - (instancetype)init {
-  self = [super init];
-  if (self) {
+    self = [super init];
+    if (!self) {
+        return
+    }
+    
     // ...
-  }
-  return self;
+    
+    return self;
 }
 ```
 
@@ -600,10 +612,11 @@ When accessing the `x`, `y`, `width`, or `height` of a `CGRect`, always use the 
 ```objc
 CGRect frame = self.view.frame;
 
-CGFloat x = CGRectGetMinX(frame);
-CGFloat y = CGRectGetMinY(frame);
-CGFloat width = CGRectGetWidth(frame);
+CGFloat x      = CGRectGetMinX(frame);
+CGFloat y      = CGRectGetMinY(frame);
+CGFloat width  = CGRectGetWidth(frame);
 CGFloat height = CGRectGetHeight(frame);
+
 CGRect frame = CGRectMake(0.0, 0.0, width, height);
 ```
 
@@ -627,11 +640,11 @@ When coding with conditionals, the left hand margin of the code should be the "g
 
 ```objc
 - (void)someMethod {
-  if (![someOther boolValue]) {
-	return;
-  }
+    if (![someOther boolValue]) {
+	    return;
+    }
 
-  //Do something important
+    //Do something important
 }
 ```
 
@@ -639,9 +652,9 @@ When coding with conditionals, the left hand margin of the code should be the "g
 
 ```objc
 - (void)someMethod {
-  if ([someOther boolValue]) {
-    //Do something important
-  }
+    if ([someOther boolValue]) {
+        //Do something important
+    }
 }
 ```
 
@@ -653,7 +666,7 @@ When methods return an error parameter by reference, switch on the returned valu
 ```objc
 NSError *error;
 if (![self trySomethingWithError:&error]) {
-  // Handle Error
+    // Handle Error
 }
 ```
 
@@ -662,7 +675,7 @@ if (![self trySomethingWithError:&error]) {
 NSError *error;
 [self trySomethingWithError:&error];
 if (error) {
-  // Handle Error
+    // Handle Error
 }
 ```
 
@@ -674,14 +687,15 @@ Some of Apple’s APIs write garbage values to the error parameter (if non-NULL)
 Singleton objects should use a thread-safe pattern for creating their shared instance.
 ```objc
 + (instancetype)sharedInstance {
-  static id sharedInstance = nil;
+    static id sharedInstance = nil;
 
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    sharedInstance = [[self alloc] init];
-  });
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[self alloc] init];
+        // Init instance
+    });
 
-  return sharedInstance;
+    return sharedInstance;
 }
 ```
 This will prevent [possible and sometimes prolific crashes](http://cocoasamurai.blogspot.com/2011/04/singletons-your-doing-them-wrong.html).
